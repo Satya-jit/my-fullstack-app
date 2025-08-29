@@ -1,25 +1,20 @@
-# Step 1: Build frontend
-FROM node:18-alpine AS frontend-build
-WORKDIR /app/frontend
-COPY frontend/package*.json ./
-RUN npm install
-COPY frontend/ ./
-RUN npm run build
-
-# Step 2: Setup backend
+# Use Node.js for backend
 FROM node:18-alpine
+
+# Set working directory
 WORKDIR /app
 
-# Copy backend package files and install deps
-COPY backend/package*.json ./backend/
-WORKDIR /app/backend
+# Copy only package.json first for caching
+COPY package.json package-lock.json* ./
+
+# Install dependencies
 RUN npm install
 
-# Copy backend code
-COPY backend/ ./
+# Copy all backend source code
+COPY . .
 
-# Copy frontend build output into backend/public
-COPY --from=frontend-build /app/frontend/build ./public
-
+# Expose backend port
 EXPOSE 5000
+
+# Run server
 CMD ["npm", "start"]
