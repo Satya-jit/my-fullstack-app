@@ -20,16 +20,21 @@ jobs:
 
       - name: Login to Amazon ECR
         run: |
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
+            | docker login --username AWS --password-stdin \
+            526971782248.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
       - name: Build and push Docker images
         run: |
-          docker build -t ${{ secrets.ECR_REPO }}-frontend ./frontend
-          docker build -t ${{ secrets.ECR_REPO }}-backend ./backend
-          docker tag ${{ secrets.ECR_REPO }}-frontend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPO }}-frontend:latest
-          docker tag ${{ secrets.ECR_REPO }}-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPO }}-backend:latest
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPO }}-frontend:latest
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPO }}-backend:latest
+          # Frontend
+          docker build -t my-fullstack-app-frontend ./frontend
+          docker tag my-fullstack-app-frontend:latest 526971782248.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-fullstack-app:frontend
+          docker push 526971782248.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-fullstack-app:frontend
+
+          # Backend
+          docker build -t my-fullstack-app-backend ./backend
+          docker tag my-fullstack-app-backend:latest 526971782248.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-fullstack-app:backend
+          docker push 526971782248.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-fullstack-app:backend
 
       - name: Zip App for CodeDeploy
         run: zip -r release.zip . 
